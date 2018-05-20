@@ -1,0 +1,95 @@
+<html>
+	<head>
+		<title>Lemon.</title>
+        <script src='jquery.js'></script>
+        <script src='velocity.js'></script>
+		<script>
+            var dat;
+            var datf;
+            var act = false;
+            $(document).ready(function()  {
+                if(localStorage.getItem('dat') != undefined)  {
+                    
+                    var arr = localStorage.getItem('dat').split(', ');
+                    datf = new Date(arr[2], arr[1] - 1, arr[0], arr[3], arr[4], arr[5]);
+                    dat = new Date();
+                    if(datf - dat >= 0)  {
+                        act = true;
+                        $('#cov').css('display', 'none');
+                    }  else  {
+                        $('#cov').css('top', '150%');
+                        $('#cov').delay(2000).velocity({top: 0}, 800, 'easeOutExpo');
+                    }
+                }
+                
+                
+                function reHou()  {dat = new Date(); return Math.floor((datf - dat) / 3600000);}
+                function reMin()  {dat = new Date(); return Math.floor(((datf - dat) % 3600000) / 60000);}
+                function reSec()  {dat = new Date(); return Math.floor((((datf - dat) % 3600000) % 60000) / 1000);}
+                function upd()  {
+                    $('#s0').html((reHou().toString().length < 2)?('0' + reHou()):reHou());
+                    $('#s1').html((reMin().toString().length < 2)?('0' + reMin()):reMin());
+                    $('#s2').html((reSec().toString().length < 2)?('0' + reSec()):reSec());
+                }
+                if(act)  {
+                    upd();
+                    setInterval(upd, 1000);
+                }
+                
+                function x()  {
+                    dat = new Date();
+                    if(datf - dat > 0)  {
+                        $('#x').html(datf - dat);
+                    }  else  {
+                        clearInterval(upd);
+                        $('#s0').html('w');
+                        $('#s1').html('e');
+                        $('#s2').html('w');
+                        $('#cov').css({top: '150%', display: 'block'});
+                        clearInterval(x);
+                        $('#cov').delay(2000).velocity({top: 0}, 800, 'easeOutExpo');
+                    }
+                }
+                if(act)  {
+                    x();
+                    setInterval(x, 1);
+                }
+                
+                $('#inp').keyup(function(e)  {
+                    if(e.key == 'Enter')  {
+                        localStorage.setItem('dat', $('#inp').val());
+                        var arr = $('#inp').val().split(', ');
+                        datf = new Date(arr[2], arr[1] - 1, arr[0], arr[3], arr[4], arr[5]);
+                        dat = new Date();
+                        if(datf - dat > 0)  {
+                            $('#cov').velocity({top: '150%'}, 800, 'easeInExpo', function()  {
+                                upd();
+                                setInterval(upd, 1000);
+                                x();
+                                setInterval(x, 1);
+                            });
+                        }  else  {
+                            $('#inp').val('You can do better ._.');
+                        }
+                    }
+                });
+            });
+			
+			
+		</script>
+        <style>
+            *  {
+                outline: 0;
+            }
+        </style>
+	</head>
+	<body style='background: linear-gradient(to right, lime, dodgerblue, rebeccapurple); overflow: hidden;'>
+		<span id='s0' style='position: absolute; top: 0; left: 0; height: 100%; width: 33.33%; font-family: SF Pro Display Thin; font-size: 20vh; text-align: center; line-height: 100vh;'>w</span>
+		<span id='s1' style='position: absolute; top: 0; left: 33.33%; height: 100%; width: 33.33%; font-family: SF Pro Display Thin; font-size: 20vh; text-align: center; line-height: 100vh;'>e</span>
+		<span id='s2' style='position: absolute; top: 0; left: 66.66%; height: 100%; width: 33.33%; font-family: SF Pro Display Thin; font-size: 20vh; text-align: center; line-height: 100vh;'>w</span>
+		<span id='x' style='position: absolute; bottom: 0; right: 0; font-family: Consolas;'></span>
+        <span id='cov' style='position: absolute; left: 0; height: 100%; width: 100%; box-shadow: 0 0 50px black; background: black; top: 150%;'>
+            <input id='inp' style='position: absolute; background: linear-gradient(to right, lime, dodgerblue, rebeccapurple); font-family: Segoe UI Light; font-size: 4vh; color: black; border-radius: 2px; height: 8%; line-height: 8vh; width: 40%; left: 30%; text-align: center; opacity: 0.9; top: 46%; border: 0;' autofocus value='Day, Month, Year, Hour, Minute, Second'></input>
+        </span>
+	</body>
+</html>
